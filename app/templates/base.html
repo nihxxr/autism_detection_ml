@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AQ-10 Screener{% endblock %}</title>
+  <meta name="description" content="A ten question autism screening for adults, based on the AQ-10. Free, private, about three minutes.">
+  <link rel="preload" href="{{ url_for('static', filename='fonts/atkinson-hyperlegible-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23276F6C'/%3E%3Cpath d='M9 22h14M9 16h10M9 10h6' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}">
+      <svg aria-hidden="true" viewBox="0 0 32 32" width="28" height="28"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M9 22h14M9 16h10M9 10h6" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      AQ-10 Screener
+    </a>
+    <nav aria-label="Main">
+      <a href="{{ url_for('about') }}" {% if request.endpoint == 'about' %}aria-current="page"{% endif %}>How scoring works</a>
+    </nav>
+  </header>
+  <main id="main" class="{% block main_class %}page{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <p>This tool screens; it does not diagnose. Only a qualified clinician can assess for autism.</p>
+    <p>Questions from the AQ-10 (Allison, Auyeung &amp; Baron-Cohen, 2012). Built by <a href="https://niharg-portfolio.netlify.app/">Nihar Girish</a>.</p>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

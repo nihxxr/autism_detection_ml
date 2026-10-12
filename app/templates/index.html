@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="intro">
+  <h1>A ten question autism screening for adults</h1>
+  <p class="lede">You read ten statements about how you notice things, focus, and read other people. For each one, you say how well it fits you. At the end you get a score out of 10 and a plain explanation of what it means.</p>
+
+  <dl class="facts">
+    <div><dt>Who it&rsquo;s for</dt><dd>Adults aged 16 and over, answering about themselves</dd></div>
+    <div><dt>Time</dt><dd>About three minutes</dd></div>
+    <div><dt>Privacy</dt><dd>Your answers aren&rsquo;t saved anywhere. Close the tab and they&rsquo;re gone.</dd></div>
+  </dl>
+
+  <div class="note">
+    <p>A screening can suggest whether a full assessment is worth asking for. It can&rsquo;t tell you whether you are autistic.</p>
+  </div>
+
+  <a class="button" href="{{ url_for('screen') }}">Start the questions</a>
+</section>
+{% endblock %}
