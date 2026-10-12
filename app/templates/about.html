@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}How scoring works | AQ-10 Screener{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>How scoring works</h1>
+
+  <p>The AQ-10 is a shortened version of the 50 item Autism Spectrum Quotient. Cambridge&rsquo;s Autism Research Centre published it in 2012 after testing it on 1,000 autistic adults and 3,000 controls.</p>
+
+  <h2>One point per statement</h2>
+  <p>Each statement scores at most one point. For four of them, agreeing scores the point. For the other six, disagreeing does. &ldquo;Slightly&rdquo; and &ldquo;definitely&rdquo; count the same.</p>
+
+  <table class="key">
+    <thead><tr><th scope="col">#</th><th scope="col">Statement</th><th scope="col">Scores when you</th></tr></thead>
+    <tbody>
+      {% for item in items %}
+      <tr><td>{{ item.number }}</td><td>{{ item.text }}</td><td>{{ 'Agree' if item.scores_on_agree else 'Disagree' }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>The referral level</h2>
+  <p>NICE guideline CG142 advises clinicians to offer a specialist assessment when an adult scores {{ threshold }} or more. It&rsquo;s a level for asking further questions, and many people above it turn out not to be autistic.</p>
+
+  <h2 id="model">About the machine learning model</h2>
+  <p>The first version of this project trained a random forest to predict autism from the ten answers. In the UCI Autism Screening Adult dataset, though, the label itself comes from the AQ-10 total: anyone scoring above 6 is marked positive. A model trained on the ten answers just relearns that sum, so its near perfect accuracy tells you nothing new.</p>
+  <p>This version scores the questionnaire directly. The training script in the repository still runs the comparison, printing the plain sum rule next to logistic regression and a random forest, so you can see the leak for yourself.</p>
+</article>
+{% endblock %}

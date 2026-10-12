@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Your result | AQ-10 Screener{% endblock %}
+{% block content %}
+<section class="result">
+  <h1 class="sr-only">Your result</h1>
+  <div class="score-block">
+    <p class="score"><span class="score-number">{{ res.score }}</span><span class="score-of"> out of 10</span></p>
+    <div class="scale" role="img" aria-label="{{ res.score }} of 10 statements scored. The referral level is {{ threshold }}.">
+      <ol class="scale-cells">
+        {% for p in res.points|sort(reverse=true) %}
+        <li class="{% if p %}on{% endif %}"></li>
+        {% endfor %}
+      </ol>
+      <p class="scale-marker" style="--at: {{ threshold - 1 }}">Referral level: {{ threshold }}</p>
+    </div>
+  </div>
+
+  {% if res.above_threshold %}
+  <h2>Your answers suggest a full assessment could be worth asking for</h2>
+  <p>In UK clinical guidance (NICE CG142), a score of {{ threshold }} or more on the AQ-10 is the point where clinicians are advised to offer a specialist autism assessment.</p>
+  <h3>What you can do next</h3>
+  <ul class="steps">
+    <li>Book time with a GP, psychiatrist or clinical psychologist and tell them you&rsquo;d like an autism assessment.</li>
+    <li>Bring this page. Print it or save it as a PDF so the clinician sees which statements fit you.</li>
+    <li>Write down a few everyday examples, like noise at work or trouble following group conversations. Real examples help more than the score.</li>
+  </ul>
+  {% else %}
+  <h2>Your score is below the usual referral level</h2>
+  <p>In UK clinical guidance (NICE CG142), clinicians offer a specialist assessment from a score of {{ threshold }}. Yours is {{ res.score }}.</p>
+  <p>The AQ-10 misses some autistic people, especially those who have learned to mask their differences. If many autistic experiences sound familiar to you, talk to a clinician anyway. Your own account counts for more than this score.</p>
+  {% endif %}
+
+  {% if model_estimate is not none %}
+  <p class="model-check">Model check: a logistic regression trained on the UCI Autism Screening Adult data gives these answers a {{ (model_estimate * 100)|round|int }}% probability of a positive screen. <a href="{{ url_for('about') }}#model">Why this mostly mirrors the score</a>.</p>
+  {% endif %}
+
+  <h2 class="answers-title">Your answers</h2>
+  <table class="answers">
+    <thead><tr><th scope="col">Statement</th><th scope="col">You said</th><th scope="col">Point</th></tr></thead>
+    <tbody>
+      {% for item, answer, point in rows %}
+      <tr class="{% if point %}scored{% endif %}">
+        <td>{{ item.text }}</td>
+        <td>{% for key, label in answers %}{% if key == answer %}{{ label }}{% endif %}{% endfor %}</td>
+        <td>{% if point %}<span class="point" aria-label="Scored a point">1</span>{% else %}<span class="no-point" aria-label="No point">0</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="result-actions">
+    <button type="button" class="button" onclick="window.print()">Print or save as PDF</button>
+    <a class="button button-quiet" href="{{ url_for('screen') }}">Answer again</a>
+  </div>
+</section>
+{% endblock %}

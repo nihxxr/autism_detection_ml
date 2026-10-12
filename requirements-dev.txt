@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest>=8
+ucimlrepo>=0.0.7
+scipy>=1.11

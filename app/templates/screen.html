@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Questions | AQ-10 Screener{% endblock %}
+{% block content %}
+<form class="screen" method="post" action="{{ url_for('result') }}" novalidate data-screen>
+  <div class="progress" data-progress hidden>
+    <p class="progress-label" aria-live="polite"><span data-current>1</span> of {{ items|length }}</p>
+    <ol class="progress-track" aria-hidden="true">
+      {% for item in items %}<li></li>{% endfor %}
+    </ol>
+  </div>
+
+  <h1 class="screen-title" data-static-title>For each statement, choose how well it describes you</h1>
+
+  {% if error %}
+  <p class="error" role="alert">{{ error }}</p>
+  {% endif %}
+
+  {% for item in items %}
+  <fieldset class="question" id="q{{ item.number }}" data-question>
+    <legend>
+      <span class="q-number">Question {{ item.number }}</span>
+      <span class="q-text">{{ item.text }}</span>
+    </legend>
+    <div class="options">
+      {% for key, label in answers %}
+      <label class="option">
+        <input type="radio" name="q{{ item.number }}" value="{{ key }}" {% if chosen.get('q' ~ item.number) == key %}checked{% endif %}>
+        <span>{{ label }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+  {% endfor %}
+
+  <div class="screen-actions">
+    <button type="button" class="button button-quiet" data-back hidden>Back</button>
+    <button type="button" class="button" data-next hidden>Next question</button>
+    <button type="submit" class="button" data-submit>See my result</button>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/screen.js') }}" defer></script>
+{% endblock %}
