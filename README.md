@@ -1,19 +1,36 @@
 # AQ-10 Screener
 
-A small Flask app that walks adults through the AQ-10, a ten question autism screening questionnaire, and explains the score in plain language.
+A Flask app for the AQ-10, the ten question autism screening questionnaire for adults. You answer one statement at a time, and the app gives you a score out of 10 with a plain explanation of what it means.
 
-You answer one statement per screen. The result page shows your score out of 10, where it sits against the referral level used in NICE guidance, and which statements scored. You can print it or save it as a PDF to take to a clinician.
+It screens. It does not diagnose.
 
-The app screens. It does not diagnose.
+## How it works
 
-## Why this replaced the original ML version
+You start on a short intro that tells you who the questionnaire is for, how long it takes, and that nothing you answer gets saved.
 
-The first version trained a random forest on the UCI Autism Screening Adult dataset and called the output a prediction. Two problems came up when I rebuilt it:
+![Intro page with who it's for, time and privacy](docs/screenshots/intro.png)
 
-1. The UCI label is computed from the AQ-10 total. Every row with a score above 6 is marked positive. A model trained on the ten answers just relearns that sum, so a near perfect accuracy number means nothing.
-2. The questions on the old form were paraphrases, not the validated AQ-10 items, and the answers were typed as 0 or 1.
+Each statement gets its own screen with four answers, from "Definitely agree" to "Definitely disagree". The bar at the top shows how far you are. You can go back and change an answer at any point.
 
-This version uses the published items and scoring rules directly. `scripts/train_model.py` still runs the experiment and prints the plain sum rule next to logistic regression and a random forest, so you can see the leak in the numbers. If you run it, the result page also shows the trained model's probability as a cross check.
+![A question with "Slightly agree" selected](docs/screenshots/question.png)
+
+The result shows your score as ten cells, one per statement, with a marker at 6. NICE guidance (CG142) tells clinicians to offer a specialist assessment at 6 or above. Under that you see what the score means, what to do next, and a table of every answer and whether it scored a point. Print it or save it as a PDF to take to a doctor.
+
+![Result page: 8 out of 10, next steps and the answer table](docs/screenshots/result.png)
+
+On a phone the answers turn into large tap targets, and the keyboard works too: arrow keys pick an answer and Enter moves on.
+
+<img src="docs/screenshots/question-mobile.png" alt="Question screen on a phone" width="300">
+
+## Scoring
+
+Each statement scores one point at most. Agreeing scores the point on four statements (1, 7, 8, 10) and disagreeing scores it on the other six. "Slightly" and "definitely" count the same. The app uses the published items and scoring from Allison, Auyeung and Baron-Cohen (2012), and the "How scoring works" page lists the key for every statement.
+
+## About the model
+
+The UCI Autism Screening Adult dataset labels a row positive when its AQ-10 total is above 6. A model trained on the ten answers relearns that sum, so its near perfect accuracy tells you nothing a calculator couldn't. The app scores the questionnaire directly for that reason.
+
+`scripts/train_model.py` runs the comparison. It downloads UCI dataset 426, prints the plain sum rule next to logistic regression and a random forest under 5-fold cross validation, and saves the logistic regression model. If that model file exists, the result page shows its probability as a cross check.
 
 ## Project layout
 
@@ -28,6 +45,7 @@ scripts/
   train_model.py    Downloads UCI dataset 426, evaluates models, saves one
 tests/
   test_app.py       Scoring and route tests
+docs/screenshots/   Images used in this README
 wsgi.py             Entry point for gunicorn and local runs
 ```
 
@@ -46,24 +64,23 @@ To train the optional model:
 
 ```bash
 python scripts/train_model.py              # fetches the UCI data
-python scripts/train_model.py path/to.csv  # or use a local CSV or ARFF file
+python scripts/train_model.py path/to.csv  # or point it at a local CSV or ARFF file
 ```
 
-This writes `models/aq10_model.joblib` and `models/metrics.json`.
+The script writes `models/aq10_model.joblib` and `models/metrics.json`.
 
 ## Deploy
 
-The `Procfile` runs `gunicorn wsgi:app`, so Render, Railway or Heroku pick it up without extra config. No environment variables are needed.
+The `Procfile` runs `gunicorn wsgi:app`, so Render, Railway and Heroku pick it up as is. You don't need any environment variables.
 
 ## Design notes
 
-The audience includes people who find busy, bright or animated pages hard to use, so the interface stays calm on purpose:
+Some people who take this screening find busy, bright or moving pages hard to use, so I kept the interface calm:
 
-- One typeface, Atkinson Hyperlegible, designed by the Braille Institute for low vision readers. It's self hosted, so the app makes no third party requests.
-- Muted grey green background and a single teal for actions. No animation anywhere.
-- One question per screen with large tap targets. Keyboard works throughout: arrow keys pick an answer, Enter moves on.
-- Without JavaScript the form still works and shows every question on one page.
-- Nothing you answer is stored. The result page is rendered from the form post and never saved.
+- One typeface, Atkinson Hyperlegible, which the Braille Institute designed for low vision readers. The app serves it from its own static folder, so it makes no third party requests.
+- A muted grey green background and one teal for actions. Nothing animates.
+- With JavaScript off, the form still works and shows all ten questions on one page.
+- The server renders the result from the form post and never stores it.
 
 ## Sources
 
